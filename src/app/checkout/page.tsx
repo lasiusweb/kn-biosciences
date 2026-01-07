@@ -10,6 +10,7 @@ const MOCK_ITEMS = [
 
 export default function CheckoutPage() {
     const [isProcessing, setIsProcessing] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('easebuzz'); // Default to Easebuzz
     const [address, setAddress] = useState({
         firstname: 'John',
         lastname: 'Doe',
@@ -32,7 +33,8 @@ export default function CheckoutPage() {
                 body: JSON.stringify({
                     items: MOCK_ITEMS,
                     userId: '00000000-0000-0000-0000-000000000000', // Mock UUID
-                    shippingAddress: address
+                    shippingAddress: address,
+                    paymentMethod: paymentMethod, // Include selected payment method
                 }),
             });
 
@@ -41,7 +43,7 @@ export default function CheckoutPage() {
             if (result.success) {
                 // In real Easebuzz integration, we would redirect to result.payment.access_key URL
                 // For mock, we show the mock URL
-                alert(`Redirecting to Payment: ${result.payment.data || 'Mock URL'}`);
+                alert(`Redirecting to Payment via ${paymentMethod}: ${result.payment.data || 'Mock URL'}`);
                 if (typeof result.payment.data === 'string' && result.payment.data.startsWith('http')) {
                     window.location.href = result.payment.data;
                 }
@@ -103,14 +105,62 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
-                        <div className="mt-8 rounded-3xl bg-green-50 p-6 border border-green-100 flex items-center gap-4">
-                            <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-green-600 shadow-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2" /><line x1="2" x2="22" y1="10" y2="10" /></svg>
+                        <div className="mt-8 rounded-3xl bg-white p-8 shadow-sm border border-neutral-100">
+                            <h2 className="mb-6 text-xl font-semibold text-neutral-800">Payment Method</h2>
+                            <div className="space-y-4">
+                                <div className="flex items-center">
+                                    <input
+                                        id="easebuzz"
+                                        name="paymentMethod"
+                                        type="radio"
+                                        value="easebuzz"
+                                        checked={paymentMethod === 'easebuzz'}
+                                        onChange={() => setPaymentMethod('easebuzz')}
+                                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-neutral-300"
+                                    />
+                                    <label htmlFor="easebuzz" className="ml-3 block text-base font-medium text-neutral-700">
+                                        Easebuzz
+                                    </label>
+                                </div>
+                                <div className="flex items-center">
+                                    <input
+                                        id="payu"
+                                        name="paymentMethod"
+                                        type="radio"
+                                        value="payu"
+                                        checked={paymentMethod === 'payu'}
+                                        onChange={() => setPaymentMethod('payu')}
+                                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-neutral-300"
+                                    />
+                                    <label htmlFor="payu" className="ml-3 block text-base font-medium text-neutral-700">
+                                        PayU
+                                    </label>
+                                </div>
                             </div>
-                            <div>
-                                <p className="font-semibold text-green-900">Easebuzz Secure Payment</p>
-                                <p className="text-sm text-green-700">Encrypted and secure transactions. Supports Cards, UPI, Netbanking.</p>
-                            </div>
+
+                            {paymentMethod === 'easebuzz' && (
+                                <div className="mt-6 rounded-3xl bg-green-50 p-6 border border-green-100 flex items-center gap-4">
+                                    <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-green-600 shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2" /><line x1="2" x2="22" y1="10" y2="10" /></svg>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-green-900">Easebuzz Secure Payment</p>
+                                        <p className="text-sm text-green-700">Encrypted and secure transactions. Supports Cards, UPI, Netbanking.</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {paymentMethod === 'payu' && (
+                                <div className="mt-6 rounded-3xl bg-blue-50 p-6 border border-blue-100 flex items-center gap-4">
+                                    <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-blue-600 shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v18Z"/><path d="M14 2v6h6"/><path d="M10 13h4"/><path d="M10 17h4"/></svg>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-blue-900">PayU Secure Payment</p>
+                                        <p className="text-sm text-blue-700">Fast and reliable payments. Supports Cards, UPI, Netbanking, Wallets.</p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -159,7 +209,7 @@ export default function CheckoutPage() {
                                         : 'bg-green-500 text-neutral-950 hover:bg-green-400 active:scale-95 shadow-green-500/20'
                                     }`}
                             >
-                                {isProcessing ? 'Processing...' : 'Complete Payment'}
+                                {isProcessing ? 'Processing...' : 'Proceed to Payment'}
                             </button>
 
                             <p className="mt-6 text-center text-xs text-neutral-500">
