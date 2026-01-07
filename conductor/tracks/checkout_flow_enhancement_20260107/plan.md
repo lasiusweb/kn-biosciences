@@ -5,7 +5,7 @@ Implement a robust and secure checkout flow, integrating Easebuzz and PayU payme
 
 ## Phase 1: Setup and Basic Checkout Flow
 
-- [ ] Task: Write tests for initial payment gateway configuration and basic checkout UI rendering.
+- [x] Task: Write tests for initial payment gateway configuration and basic checkout UI rendering. [88ec3f5]
 - [ ] Task: Implement initial payment gateway configuration scaffolding (environment variables, service stubs).
 - [ ] Task: Implement basic checkout page UI, displaying payment options.
 - [ ] Task: Conductor - User Manual Verification 'Setup and Basic Checkout Flow' (Protocol in workflow.md)
