@@ -3,7 +3,7 @@
 ## Track Description
 Implement a robust and secure checkout flow, integrating Easebuzz and PayU payment gateways, and enhancing customer communication with Supabase Twilio for order notifications.
 
-## Phase 1: Setup and Basic Checkout Flow
+## Phase 1: Setup and Basic Checkout Flow [checkpoint: f3bb4df]
 
 - [x] Task: Write tests for initial payment gateway configuration and basic checkout UI rendering. [88ec3f5]
 - [x] Task: Implement initial payment gateway configuration scaffolding (environment variables, service stubs). [9ca7fd3]
