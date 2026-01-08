@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { EasebuzzService } from '@/lib/integrations/easebuzz';
 
+import { PayUService } from '@/lib/integrations/payu';
+
 export async function POST(req: Request) {
     try {
         const { items, userId, shippingAddress, paymentMethod } = await req.json();
@@ -45,11 +47,28 @@ export async function POST(req: Request) {
             });
             paymentResponseData = paymentResponse;
         } else if (paymentMethod === 'payu') {
-            // Placeholder for PayU integration - will be implemented in a later task
+            // 3. Initiate PayU Payment
+            const payu = new PayUService({
+                merchantKey: process.env.PAYU_MERCHANT_KEY || '',
+                salt: process.env.PAYU_SALT || '',
+                env: (process.env.PAYU_ENV as 'test' | 'prod') || 'test'
+            });
+
+            const paymentPayload = await payu.initiatePayment({
+                txnid: order.id,
+                amount: totalAmount.toFixed(2),
+                productinfo: `Order #${order.id}`,
+                firstname: shippingAddress.firstname || 'Customer',
+                email: shippingAddress.email || 'customer@example.com',
+                phone: shippingAddress.phone || '9999999999',
+                surl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/payu`,
+                furl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/payu`
+            });
+            
             paymentResponseData = {
                 success: true,
-                data: 'mock_payu_url',
-                msg: 'PayU payment initiated (mocked)'
+                type: 'form_post', // Signal frontend to submit a form
+                data: paymentPayload
             };
         } else {
             return NextResponse.json({ success: false, error: 'Unsupported payment method' }, { status: 400 });

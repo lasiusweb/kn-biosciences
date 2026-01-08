@@ -46,13 +46,31 @@ jest.mock('@/lib/integrations/easebuzz', () => {
   };
 });
 
+// Mock PayUService
+const mockPayUInitiatePayment = jest.fn(() => ({
+  action: 'https://test.payu.in/_payment',
+  key: 'payu_key',
+  hash: 'mock_hash',
+}));
+jest.mock('@/lib/integrations/payu', () => {
+  return {
+    PayUService: jest.fn().mockImplementation(() => ({
+      initiatePayment: mockPayUInitiatePayment,
+    })),
+  };
+});
+
 describe('Checkout API Route - Easebuzz Initiation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockEasebuzzInitiatePayment.mockClear();
+    mockPayUInitiatePayment.mockClear();
     process.env.EASEBUZZ_MERCHANT_KEY = 'test_key';
     process.env.EASEBUZZ_SALT = 'test_salt';
     process.env.EASEBUZZ_ENV = 'test';
+    process.env.PAYU_MERCHANT_KEY = 'payu_key';
+    process.env.PAYU_SALT = 'payu_salt';
+    process.env.PAYU_ENV = 'test';
     process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
   });
 
