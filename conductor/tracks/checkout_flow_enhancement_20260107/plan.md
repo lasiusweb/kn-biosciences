@@ -10,13 +10,13 @@ Implement a robust and secure checkout flow, integrating Easebuzz and PayU payme
 - [x] Task: Implement basic checkout page UI, displaying payment options. [c010a2d]
 - [~] Task: Conductor - User Manual Verification 'Setup and Basic Checkout Flow' (Protocol in workflow.md)
 
-## Phase 2: Easebuzz Integration
+## Phase 2: Easebuzz Integration [checkpoint: 5b3c12b]
 
 - [x] Task: Write tests for Easebuzz payment initiation and callback handling. [576bcdc]
 - [x] Task: Implement Easebuzz payment initiation logic (redirect to gateway). [ad12345]
 - [x] Task: Implement Easebuzz webhook/callback handler to update order status. [bd23456]
 - [x] Task: Implement error handling and user feedback for Easebuzz transactions. [cd34567]
-- [~] Task: Conductor - User Manual Verification 'Easebuzz Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Easebuzz Integration' (Protocol in workflow.md) [5b3c12b]
 
 ## Phase 3: PayU Integration
 
