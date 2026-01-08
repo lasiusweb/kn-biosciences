@@ -41,11 +41,30 @@ export default function CheckoutPage() {
             const result = await response.json();
 
             if (result.success) {
-                // In real Easebuzz integration, we would redirect to result.payment.access_key URL
-                // For mock, we show the mock URL
-                alert(`Redirecting to Payment via ${paymentMethod}: ${result.payment.data || 'Mock URL'}`);
-                if (typeof result.payment.data === 'string' && result.payment.data.startsWith('http')) {
+                if (result.payment?.type === 'form_post') {
+                    // Handle PayU Form Post
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = result.payment.data.action;
+                    
+                    Object.keys(result.payment.data).forEach(key => {
+                        if (key !== 'action') {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = key;
+                            input.value = result.payment.data[key];
+                            form.appendChild(input);
+                        }
+                    });
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                } else if (result.payment?.data && typeof result.payment.data === 'string' && result.payment.data.startsWith('http')) {
+                    // Handle Easebuzz Redirect
+                    alert(`Redirecting to Payment via ${paymentMethod}: ${result.payment.data}`);
                     window.location.href = result.payment.data;
+                } else {
+                    alert('Invalid payment configuration received.');
                 }
             } else {
                 alert('Checkout failed: ' + result.error);
