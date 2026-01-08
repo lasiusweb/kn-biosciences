@@ -43,11 +43,12 @@ export async function POST(req: Request) {
                 surl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/easebuzz?status=success`,
                 furl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/easebuzz?status=failure`
             });
-            paymentResponseData = paymentResponse.data;
+            paymentResponseData = paymentResponse;
         } else if (paymentMethod === 'payu') {
             // Placeholder for PayU integration - will be implemented in a later task
             paymentResponseData = {
-                url: 'mock_payu_url',
+                success: true,
+                data: 'mock_payu_url',
                 msg: 'PayU payment initiated (mocked)'
             };
         } else {

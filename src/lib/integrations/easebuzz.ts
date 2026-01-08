@@ -42,19 +42,54 @@ export class EasebuzzService {
     }
 
     const hash = this.generateHash(data);
-    const payload = {
-      ...data,
-      key: this.config.merchantKey,
-      hash: hash,
-    };
+    
+    const params = new URLSearchParams();
+    params.append('key', this.config.merchantKey);
+    params.append('txnid', data.txnid);
+    params.append('amount', data.amount);
+    params.append('productinfo', data.productinfo);
+    params.append('firstname', data.firstname);
+    params.append('email', data.email);
+    params.append('phone', data.phone);
+    params.append('surl', data.surl);
+    params.append('furl', data.furl);
+    params.append('hash', hash);
 
-    // In a real implementation, we would POST to Easebuzz and get the access key/URL
-    // For now, we return the payload that would be sent to the checkout page
-    return {
-      status: 'success',
-      data: payload,
-      message: 'Payment credentials generated'
-    };
+    try {
+      const response = await fetch(`${this.baseUrl}/payment/initiate.php`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        },
+        body: params.toString(),
+      });
+
+      const result = await response.json();
+
+      if (result.status === 1) {
+        // Success: result.data is the access key
+        return {
+          status: 'success',
+          data: `${this.baseUrl}/pay/${result.data}`,
+          message: 'Payment URL generated successfully'
+        };
+      } else {
+        // Error
+        return {
+          status: 'error',
+          data: null,
+          message: result.data || 'Failed to initiate payment'
+        };
+      }
+    } catch (error: any) {
+      console.error('[EASEBUZZ_INITIATE_ERROR]', error);
+      return {
+        status: 'error',
+        data: null,
+        message: error.message || 'Network error while initiating payment'
+      };
+    }
   }
 
   verifyWebhook(data: any, receivedHash: string): boolean {

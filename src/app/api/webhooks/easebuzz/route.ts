@@ -39,12 +39,15 @@ export async function POST(req: Request) {
 
         if (updateError) throw updateError;
 
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || '';
+
         if (paymentStatus === 'success') {
             // 3. Trigger Post-Payment Automations (Async)
             handlePostPayment(order);
+            return NextResponse.redirect(`${baseUrl}/checkout/success?txnid=${orderId}`, { status: 303 });
+        } else {
+            return NextResponse.redirect(`${baseUrl}/checkout/failure?txnid=${orderId}&error=Payment+failed`, { status: 303 });
         }
-
-        return NextResponse.json({ success: true });
 
     } catch (error: any) {
         console.error('[WEBHOOK_ERROR]', error);
