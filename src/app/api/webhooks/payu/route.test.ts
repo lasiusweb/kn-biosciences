@@ -20,8 +20,9 @@ jest.mock('next/server', () => ({
 
 const mockUpdate = jest.fn().mockReturnThis();
 const mockEq = jest.fn().mockReturnThis();
+const mockSelect = jest.fn().mockReturnThis();
 const mockSingle = jest.fn(() => Promise.resolve({ 
-  data: { id: 'mock_order_id', total_amount: 200 }, 
+  data: { id: 'mock_order_id', total_amount: 200, shipping_address: { email: 'test@example.com', phone: '1234567890' } }, 
   error: null 
 }));
 
@@ -30,6 +31,7 @@ jest.mock('@/lib/supabase', () => ({
     from: jest.fn(() => ({
       update: mockUpdate,
       eq: mockEq,
+      select: mockSelect,
       single: mockSingle,
     })),
   },

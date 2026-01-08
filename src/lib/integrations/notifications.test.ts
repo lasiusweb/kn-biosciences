@@ -1,54 +1,44 @@
 import { NotificationService } from './notifications';
 
+// Mock the twilio module
+jest.mock('twilio', () => {
+  const mMessages = {
+    create: jest.fn().mockResolvedValue({ sid: 'SM_mock_real_sid', status: 'sent' }),
+  };
+  return jest.fn(() => ({
+    messages: mMessages,
+  }));
+});
+
 describe('NotificationService', () => {
   const config = {
     twilio: {
-      accountSid: 'test_sid',
-      authToken: 'test_token',
-      phoneNumber: 'test_phone',
+      accountSid: 'real_sid',
+      authToken: 'real_token',
+      phoneNumber: '+1234567890',
     }
   };
 
   let service: NotificationService;
+  let twilioMock: any;
 
   beforeEach(() => {
+    jest.clearAllMocks();
     service = new NotificationService(config);
-    // Mock the external SMS sending logic if it's already implemented or to be implemented.
-    // Assuming NotificationService uses a Twilio client under the hood.
+    twilioMock = require('twilio');
   });
 
-  it('should send an order confirmation SMS', async () => {
-    const orderData = {
-      id: 'order123',
-      total_amount: 1500,
-      customer_phone: '9999999999',
-    };
-
-    // We expect a method like sendOrderConfirmationSMS
-    const spy = jest.spyOn(service, 'sendWhatsApp'); // Assuming WhatsApp is used per spec for order confirmation
+  it('should call Twilio API for order confirmation SMS', async () => {
+    const to = '9999999999';
+    const message = 'Order Confirmed!';
     
-    await service.sendWhatsApp(orderData.customer_phone, `Order Confirmed! Your Order #${orderData.id} has been placed.`);
+    await service.sendSMS(to, message);
 
-    expect(spy).toHaveBeenCalledWith(
-      '9999999999',
-      expect.stringContaining('Order Confirmed!')
-    );
-  });
-
-  it('should send an order status update SMS', async () => {
-    const orderData = {
-      id: 'order123',
-      status: 'shipped',
-      customer_phone: '9999999999',
-    };
-
-    const spy = jest.spyOn(service, 'sendWhatsApp');
-    
-    await service.sendWhatsApp(orderData.customer_phone, `Your Order #${orderData.id} status has been updated to ${orderData.status}.`);
-
-    expect(spy).toHaveBeenCalledWith(
-      '9999999999',
-      expect.stringContaining('status has been updated to shipped')
-    );
+    const clientInstance = twilioMock.mock.results[0].value;
+    expect(clientInstance.messages.create).toHaveBeenCalledWith(expect.objectContaining({
+      body: message,
+      from: config.twilio.phoneNumber,
+      to: to
+    }));
   });
 });
