@@ -18,14 +18,14 @@ Implement a robust and secure checkout flow, integrating Easebuzz and PayU payme
 - [x] Task: Implement error handling and user feedback for Easebuzz transactions. [cd34567]
 - [x] Task: Conductor - User Manual Verification 'Easebuzz Integration' (Protocol in workflow.md) [5b3c12b]
 
-## Phase 3: PayU Integration
+## Phase 3: PayU Integration [checkpoint: 7f830f0]
 
 - [x] Task: Write tests for PayU payment initiation and callback handling. [abcdef1]
 - [x] Task: Implement PayU payment initiation logic (redirect to gateway). [bcdef12]
 - [x] Task: Implement PayU webhook/callback handler to update order status. [cdef123]
 - [x] Task: Implement error handling and user feedback for PayU transactions. [def1234]
 - [x] Task: Update checkout frontend to handle PayU form post redirection. [ef12345]
-- [~] Task: Conductor - User Manual Verification 'PayU Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'PayU Integration' (Protocol in workflow.md) [7f830f0]
 
 ## Phase 4: Supabase Twilio Notifications
 
