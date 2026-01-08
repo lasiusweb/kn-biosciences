@@ -41,4 +41,18 @@ describe('NotificationService', () => {
       to: to
     }));
   });
+
+  it('should call Twilio API for order status update SMS', async () => {
+    const to = '9999999999';
+    const message = 'Your Order #123 is now Shipped.';
+    
+    await service.sendSMS(to, message);
+
+    const clientInstance = twilioMock.mock.results[0].value;
+    expect(clientInstance.messages.create).toHaveBeenCalledWith(expect.objectContaining({
+      body: message,
+      from: config.twilio.phoneNumber,
+      to: to
+    }));
+  });
 });
