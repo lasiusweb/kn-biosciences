@@ -129,12 +129,12 @@ describe('Checkout API Route - Easebuzz Initiation', () => {
     expect(response.status).toBe(500); // Now checking the status from the mock directly
   });
 
-  it('should return mock response for PayU (placeholder)', async () => {
+  it('should initiate PayU payment when paymentMethod is payu', async () => {
     const mockRequest = {
       json: () => Promise.resolve({
         items: [{ price: 100, quantity: 1 }],
         userId: 'user456',
-        shippingAddress: {},
+        shippingAddress: { firstname: 'Jane', email: 'jane@example.com', phone: '0987654321' },
         paymentMethod: 'payu',
       }),
     } as Request;
@@ -143,6 +143,11 @@ describe('Checkout API Route - Easebuzz Initiation', () => {
     const result = await response.json();
 
     expect(result.success).toBe(true);
-    expect(result.payment.msg).toContain('PayU payment initiated');
+    expect(result.payment.type).toBe('form_post');
+    expect(result.payment.data).toEqual(expect.objectContaining({
+      key: 'payu_key',
+      hash: 'mock_hash',
+      action: 'https://test.payu.in/_payment'
+    }));
   });
 });
