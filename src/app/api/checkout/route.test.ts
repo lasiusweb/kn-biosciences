@@ -7,9 +7,9 @@ import { EasebuzzService } from '@/lib/integrations/easebuzz';
 // Mock Next.js and Supabase
 jest.mock('next/server', () => ({
   NextResponse: {
-    json: jest.fn(data => ({
+    json: jest.fn((data, init?: ResponseInit) => ({
       json: () => Promise.resolve(data),
-      status: data.status || 200
+      status: init?.status || 200
     })),
   },
 }));
@@ -33,19 +33,23 @@ jest.mock('@/lib/supabase', () => ({
 }));
 
 // Mock EasebuzzService
-jest.mock('@/lib/integrations/easebuzz', () => ({
-  EasebuzzService: jest.fn().mockImplementation(() => ({
-    initiatePayment: jest.fn(() => ({
-      data: 'mock_easebuzz_url',
-      status: 'success',
-      error_message: null
-    })),
-  })),
+const mockEasebuzzInitiatePayment = jest.fn(() => ({
+  data: 'mock_easebuzz_url',
+  status: 'success',
+  error_message: null
 }));
+jest.mock('@/lib/integrations/easebuzz', () => {
+  return {
+    EasebuzzService: jest.fn().mockImplementation(() => ({
+      initiatePayment: mockEasebuzzInitiatePayment,
+    })),
+  };
+});
 
 describe('Checkout API Route - Easebuzz Initiation', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockEasebuzzInitiatePayment.mockClear();
     process.env.EASEBUZZ_MERCHANT_KEY = 'test_key';
     process.env.EASEBUZZ_SALT = 'test_salt';
     process.env.EASEBUZZ_ENV = 'test';
@@ -70,7 +74,7 @@ describe('Checkout API Route - Easebuzz Initiation', () => {
       salt: 'test_salt',
       env: 'test'
     }));
-    expect(EasebuzzService.mock.instances[0].initiatePayment).toHaveBeenCalledWith(expect.objectContaining({
+    expect(mockEasebuzzInitiatePayment).toHaveBeenCalledWith(expect.objectContaining({
       txnid: 'mock_order_id',
       amount: '100.00',
       productinfo: 'Order #mock_order_id',
@@ -104,6 +108,6 @@ describe('Checkout API Route - Easebuzz Initiation', () => {
 
     expect(result.success).toBe(false);
     expect(result.error).toBe('DB Error');
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(500); // Now checking the status from the mock directly
   });
 });

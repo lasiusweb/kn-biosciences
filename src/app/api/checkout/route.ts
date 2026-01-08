@@ -4,7 +4,7 @@ import { EasebuzzService } from '@/lib/integrations/easebuzz';
 
 export async function POST(req: Request) {
     try {
-        const { items, userId, shippingAddress } = await req.json();
+        const { items, userId, shippingAddress, paymentMethod } = await req.json();
 
         // 1. Calculate total (In real app, fetch prices from DB)
         const totalAmount = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
@@ -23,28 +23,41 @@ export async function POST(req: Request) {
 
         if (orderError) throw orderError;
 
-        // 3. Initiate Easebuzz Payment
-        const easebuzz = new EasebuzzService({
-            merchantKey: process.env.EASEBUZZ_MERCHANT_KEY || '',
-            salt: process.env.EASEBUZZ_SALT || '',
-            env: (process.env.EASEBUZZ_ENV as 'test' | 'prod') || 'test'
-        });
+        let paymentResponseData;
 
-        const paymentResponse = await easebuzz.initiatePayment({
-            txnid: order.id,
-            amount: totalAmount.toFixed(2),
-            productinfo: `Order #${order.id}`,
-            firstname: shippingAddress.firstname || 'Customer',
-            email: shippingAddress.email || 'customer@example.com',
-            phone: shippingAddress.phone || '9999999999',
-            surl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/easebuzz?status=success`,
-            furl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/easebuzz?status=failure`
-        });
+        if (paymentMethod === 'easebuzz') {
+            // 3. Initiate Easebuzz Payment
+            const easebuzz = new EasebuzzService({
+                merchantKey: process.env.EASEBUZZ_MERCHANT_KEY || '',
+                salt: process.env.EASEBUZZ_SALT || '',
+                env: (process.env.EASEBUZZ_ENV as 'test' | 'prod') || 'test'
+            });
+
+            const paymentResponse = await easebuzz.initiatePayment({
+                txnid: order.id,
+                amount: totalAmount.toFixed(2),
+                productinfo: `Order #${order.id}`,
+                firstname: shippingAddress.firstname || 'Customer',
+                email: shippingAddress.email || 'customer@example.com',
+                phone: shippingAddress.phone || '9999999999',
+                surl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/easebuzz?status=success`,
+                furl: `${process.env.NEXT_PUBLIC_BASE_URL}/api/webhooks/easebuzz?status=failure`
+            });
+            paymentResponseData = paymentResponse.data;
+        } else if (paymentMethod === 'payu') {
+            // Placeholder for PayU integration - will be implemented in a later task
+            paymentResponseData = {
+                url: 'mock_payu_url',
+                msg: 'PayU payment initiated (mocked)'
+            };
+        } else {
+            return NextResponse.json({ success: false, error: 'Unsupported payment method' }, { status: 400 });
+        }
 
         return NextResponse.json({
             success: true,
             orderId: order.id,
-            payment: paymentResponse.data
+            payment: paymentResponseData
         });
 
     } catch (error: any) {
