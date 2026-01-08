@@ -5,8 +5,12 @@ jest.mock('twilio', () => {
   const mMessages = {
     create: jest.fn().mockResolvedValue({ sid: 'SM_mock_real_sid', status: 'sent' }),
   };
+  const mCalls = {
+    create: jest.fn().mockResolvedValue({ sid: 'CA_mock_call_sid', status: 'queued' }),
+  };
   return jest.fn(() => ({
     messages: mMessages,
+    calls: mCalls,
   }));
 });
 
@@ -53,6 +57,19 @@ describe('NotificationService', () => {
       body: message,
       from: config.twilio.phoneNumber,
       to: to
+    }));
+  });
+
+  it('should call Twilio API to initiate a voice call', async () => {
+    const to = '9999999999';
+    
+    await service.initiateCall(to);
+
+    const clientInstance = twilioMock.mock.results[0].value;
+    expect(clientInstance.calls.create).toHaveBeenCalledWith(expect.objectContaining({
+      to: to,
+      from: config.twilio.phoneNumber,
+      url: expect.stringContaining('twiml'), // Expecting some TwiML URL or logic
     }));
   });
 });
