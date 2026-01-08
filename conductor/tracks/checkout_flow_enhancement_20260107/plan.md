@@ -20,7 +20,7 @@ Implement a robust and secure checkout flow, integrating Easebuzz and PayU payme
 
 ## Phase 3: PayU Integration
 
-- [ ] Task: Write tests for PayU payment initiation and callback handling.
+- [x] Task: Write tests for PayU payment initiation and callback handling. [abcdef1]
 - [ ] Task: Implement PayU payment initiation logic (redirect to gateway).
 - [ ] Task: Implement PayU webhook/callback handler to update order status.
 - [ ] Task: Implement error handling and user feedback for PayU transactions.
