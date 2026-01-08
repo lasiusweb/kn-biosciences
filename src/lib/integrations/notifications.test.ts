@@ -69,7 +69,7 @@ describe('NotificationService', () => {
     expect(clientInstance.calls.create).toHaveBeenCalledWith(expect.objectContaining({
       to: to,
       from: config.twilio.phoneNumber,
-      url: expect.stringContaining('twiml'), // Expecting some TwiML URL or logic
+      url: expect.stringContaining('voice.xml'), // Expecting some TwiML URL or logic
     }));
   });
 });

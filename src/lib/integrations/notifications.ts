@@ -58,4 +58,20 @@ export class NotificationService {
 
         return { success: true };
     }
+
+    async initiateCall(to: string) {
+        console.log(`[TWILIO] Initiating call to ${to}`);
+
+        try {
+            const result = await this.twilioClient.calls.create({
+                url: 'http://demo.twilio.com/docs/voice.xml', // Placeholder TwiML or your own TwiML Bin URL
+                to: to,
+                from: this.config.twilio.phoneNumber,
+            });
+            return { success: true, sid: result.sid, status: result.status };
+        } catch (error: any) {
+            console.error('[TWILIO_CALL_ERROR]', error);
+            return { success: false, error: error.message };
+        }
+    }
 }
