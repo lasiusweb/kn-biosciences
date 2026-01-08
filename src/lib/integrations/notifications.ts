@@ -1,3 +1,5 @@
+import twilio from 'twilio';
+
 export interface NotificationConfig {
     twilio: {
         accountSid: string;
@@ -13,20 +15,27 @@ export interface NotificationConfig {
 
 export class NotificationService {
     private config: NotificationConfig;
+    private twilioClient: twilio.Twilio;
 
     constructor(config: NotificationConfig) {
         this.config = config;
+        this.twilioClient = twilio(config.twilio.accountSid, config.twilio.authToken);
     }
 
     async sendSMS(to: string, message: string) {
         console.log(`[TWILIO] Sending SMS to ${to}: ${message}`);
 
-        if (this.config.twilio.accountSid.includes('aaaaa')) {
-            return { success: true, sid: 'SMmock_sid_123', status: 'sent' };
+        try {
+            const result = await this.twilioClient.messages.create({
+                body: message,
+                from: this.config.twilio.phoneNumber,
+                to: to
+            });
+            return { success: true, sid: result.sid, status: result.status };
+        } catch (error: any) {
+            console.error('[TWILIO_ERROR]', error);
+            return { success: false, error: error.message };
         }
-
-        // Real Twilio API call
-        return { success: false, error: 'Mock keys used' };
     }
 
     async sendWhatsApp(to: string, message: string) {

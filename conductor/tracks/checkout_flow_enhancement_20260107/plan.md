@@ -30,7 +30,7 @@ Implement a robust and secure checkout flow, integrating Easebuzz and PayU payme
 ## Phase 4: Supabase Twilio Notifications
 
 - [x] Task: Write tests for Supabase Twilio SMS notification integration (order confirmation). [cf12345]
-- [ ] Task: Implement Supabase Twilio integration for sending order confirmation SMS.
+- [x] Task: Implement Supabase Twilio integration for sending order confirmation SMS. [dg23456]
 - [ ] Task: Write tests for order status update SMS notifications.
 - [ ] Task: Implement logic to send SMS notifications on order status changes.
 - [ ] Task: Write tests for Twilio Flex voice call initiation.
