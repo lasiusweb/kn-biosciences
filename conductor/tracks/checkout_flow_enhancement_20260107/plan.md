@@ -37,10 +37,10 @@ Implement a robust and secure checkout flow, integrating Easebuzz and PayU payme
 - [x] Task: Implement Twilio Flex integration for voice call initiation from admin panel. [hk56789]
 - [x] Task: Conductor - User Manual Verification 'Supabase Twilio Notifications' (Protocol in workflow.md) [5b8b431]
 
-## Phase 5: Refinement and Testing
+## Phase 5: Refinement and Testing [checkpoint: 0326303]
 
 - [x] Task: Write comprehensive integration tests for the entire checkout flow with both gateways. [fg12345]
 - [x] Task: Implement robust error logging and monitoring for payment processes. [gh23456]
 - [x] Task: Conduct security review and implement necessary security enhancements for the checkout flow. [hi34567]
 - [x] Task: Perform manual and automated end-to-end testing of the complete checkout and notification system. [ij45678]
-- [ ] Task: Conductor - User Manual Verification 'Refinement and Testing' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Refinement and Testing' (Protocol in workflow.md) [0326303]
