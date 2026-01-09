@@ -2,8 +2,9 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
-export default function FailurePage() {
+function FailureContent() {
     const searchParams = useSearchParams();
     const error = searchParams.get('error') || 'Payment failed or was cancelled.';
 
@@ -35,3 +36,12 @@ export default function FailurePage() {
         </div>
     );
 }
+
+export default function FailurePage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <FailureContent />
+        </Suspense>
+    );
+}
+
