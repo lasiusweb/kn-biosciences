@@ -86,8 +86,8 @@ describe('Checkout API Route - Easebuzz Initiation', () => {
   it('should initiate Easebuzz payment when paymentMethod is easebuzz', async () => {
     const mockRequest = {
       json: () => Promise.resolve({
-        items: [{ price: 50, quantity: 2 }],
-        userId: 'user123',
+        items: [{ id: 'p1', price: 50, quantity: 2 }],
+        userId: '00000000-0000-0000-0000-000000000000',
         shippingAddress: { firstname: 'John', email: 'john@example.com', phone: '1234567890' },
         paymentMethod: 'easebuzz',
       }),
@@ -123,9 +123,9 @@ describe('Checkout API Route - Easebuzz Initiation', () => {
 
     const mockRequest = {
       json: () => Promise.resolve({
-        items: [{ price: 50, quantity: 2 }],
-        userId: 'user123',
-        shippingAddress: {},
+        items: [{ id: 'p1', price: 50, quantity: 2 }],
+        userId: '00000000-0000-0000-0000-000000000000',
+        shippingAddress: { firstname: 'John', email: 'john@example.com', phone: '1234567890' },
         paymentMethod: 'easebuzz',
       }),
     } as Request;
@@ -141,8 +141,8 @@ describe('Checkout API Route - Easebuzz Initiation', () => {
   it('should initiate PayU payment when paymentMethod is payu', async () => {
     const mockRequest = {
       json: () => Promise.resolve({
-        items: [{ price: 100, quantity: 1 }],
-        userId: 'user456',
+        items: [{ id: 'p2', price: 100, quantity: 1 }],
+        userId: '00000000-0000-0000-0000-000000000000',
         shippingAddress: { firstname: 'Jane', email: 'jane@example.com', phone: '0987654321' },
         paymentMethod: 'payu',
       }),
