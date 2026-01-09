@@ -27,7 +27,7 @@ Implement a robust and secure checkout flow, integrating Easebuzz and PayU payme
 - [x] Task: Update checkout frontend to handle PayU form post redirection. [ef12345]
 - [x] Task: Conductor - User Manual Verification 'PayU Integration' (Protocol in workflow.md) [7f830f0]
 
-## Phase 4: Supabase Twilio Notifications
+## Phase 4: Supabase Twilio Notifications [checkpoint: 5b8b431]
 
 - [x] Task: Write tests for Supabase Twilio SMS notification integration (order confirmation). [cf12345]
 - [x] Task: Implement Supabase Twilio integration for sending order confirmation SMS. [dg23456]
@@ -35,7 +35,7 @@ Implement a robust and secure checkout flow, integrating Easebuzz and PayU payme
 - [x] Task: Implement logic to send SMS notifications on order status changes. [fi34567]
 - [x] Task: Write tests for Twilio Flex voice call initiation. [gj45678]
 - [x] Task: Implement Twilio Flex integration for voice call initiation from admin panel. [hk56789]
-- [ ] Task: Conductor - User Manual Verification 'Supabase Twilio Notifications' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Supabase Twilio Notifications' (Protocol in workflow.md) [5b8b431]
 
 ## Phase 5: Refinement and Testing
 
