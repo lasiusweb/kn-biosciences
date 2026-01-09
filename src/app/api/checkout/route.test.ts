@@ -4,6 +4,15 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { EasebuzzService } from '@/lib/integrations/easebuzz';
 
+// Mock LoggerService
+jest.mock('@/lib/logger', () => ({
+  LoggerService: {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
 // Mock Next.js and Supabase
 jest.mock('next/server', () => ({
   NextResponse: {

@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { EasebuzzService } from '@/lib/integrations/easebuzz';
-
 import { PayUService } from '@/lib/integrations/payu';
+import { LoggerService } from '@/lib/logger';
 
 export async function POST(req: Request) {
     try {
         const { items, userId, shippingAddress, paymentMethod } = await req.json();
+
+        await LoggerService.info('checkout', 'order_initiation', { userId, paymentMethod, itemsCount: items.length });
 
         // 1. Calculate total (In real app, fetch prices from DB)
         const totalAmount = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
@@ -23,7 +25,12 @@ export async function POST(req: Request) {
             .select()
             .single();
 
-        if (orderError) throw orderError;
+        if (orderError) {
+            await LoggerService.error('checkout', 'order_creation_failed', { error: orderError.message, userId });
+            throw orderError;
+        }
+
+        await LoggerService.info('checkout', 'order_created', { orderId: order.id }, order.id);
 
         let paymentResponseData;
 
@@ -71,8 +78,11 @@ export async function POST(req: Request) {
                 data: paymentPayload
             };
         } else {
+            await LoggerService.warn('checkout', 'unsupported_payment_method', { paymentMethod, orderId: order.id }, order.id);
             return NextResponse.json({ success: false, error: 'Unsupported payment method' }, { status: 400 });
         }
+
+        await LoggerService.info('checkout', 'checkout_completion', { orderId: order.id, paymentMethod }, order.id);
 
         return NextResponse.json({
             success: true,
@@ -81,6 +91,7 @@ export async function POST(req: Request) {
         });
 
     } catch (error: any) {
+        await LoggerService.error('checkout', 'checkout_exception', { error: error.message });
         console.error('[CHECKOUT_ERROR]', error);
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }

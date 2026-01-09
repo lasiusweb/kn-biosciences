@@ -40,7 +40,7 @@ Implement a robust and secure checkout flow, integrating Easebuzz and PayU payme
 ## Phase 5: Refinement and Testing
 
 - [x] Task: Write comprehensive integration tests for the entire checkout flow with both gateways. [fg12345]
-- [ ] Task: Implement robust error logging and monitoring for payment processes.
+- [x] Task: Implement robust error logging and monitoring for payment processes. [gh23456]
 - [ ] Task: Conduct security review and implement necessary security enhancements for the checkout flow.
 - [ ] Task: Perform manual and automated end-to-end testing of the complete checkout and notification system.
 - [ ] Task: Conductor - User Manual Verification 'Refinement and Testing' (Protocol in workflow.md)

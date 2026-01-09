@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { LoggerService } from '../logger';
 
 export interface PayUConfig {
   merchantKey: string;
@@ -33,6 +34,7 @@ export class PayUService {
     surl: string;
     furl: string;
   }) {
+    await LoggerService.info('payu', 'initiation_started', { txnid: data.txnid, amount: data.amount }, data.txnid);
     const hash = this.generateHash(data);
     
     // PayU expects a form POST. Since we are in an API route, we can return the payload
@@ -68,6 +70,12 @@ export class PayUService {
     const hashString = `${this.config.salt}|${data.status}|||||||||||${data.email}|${data.firstname}|${data.productinfo}|${data.amount}|${data.txnid}|${this.config.merchantKey}`;
     const calculatedHash = crypto.createHash('sha512').update(hashString).digest('hex');
     
-    return calculatedHash === receivedHash;
+    const isValid = calculatedHash === receivedHash;
+
+    if (!isValid) {
+      LoggerService.error('payu', 'webhook_hash_mismatch', { received: receivedHash, calculated: calculatedHash }, data.txnid);
+    }
+
+    return isValid;
   }
 }

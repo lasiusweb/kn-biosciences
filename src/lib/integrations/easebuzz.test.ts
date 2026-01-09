@@ -1,6 +1,15 @@
 import { EasebuzzService } from './easebuzz';
 import crypto from 'crypto';
 
+// Mock LoggerService
+jest.mock('../logger', () => ({
+  LoggerService: {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
 describe('EasebuzzService', () => {
   const config = {
     merchantKey: 'test_key',

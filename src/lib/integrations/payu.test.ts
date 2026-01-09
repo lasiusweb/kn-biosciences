@@ -1,6 +1,15 @@
 import { PayUService } from './payu';
 import crypto from 'crypto';
 
+// Mock LoggerService
+jest.mock('../logger', () => ({
+  LoggerService: {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
 describe('PayUService', () => {
   const config = {
     merchantKey: 'payu_test_key',

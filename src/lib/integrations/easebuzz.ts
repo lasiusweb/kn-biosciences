@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { LoggerService } from '../logger';
 
 export interface EasebuzzConfig {
   merchantKey: string;
@@ -32,6 +33,8 @@ export class EasebuzzService {
     surl: string;
     furl: string;
   }) {
+    await LoggerService.info('easebuzz', 'initiation_started', { txnid: data.txnid, amount: data.amount }, data.txnid);
+
     if (this.config.merchantKey === 'DKJ87SDJK763') {
       console.log('[MOCK] Easebuzz: Initiating payment with mock keys');
       return {
@@ -68,6 +71,7 @@ export class EasebuzzService {
       const result = await response.json();
 
       if (result.status === 1) {
+        await LoggerService.info('easebuzz', 'initiation_success', { access_key: result.data }, data.txnid);
         // Success: result.data is the access key
         return {
           status: 'success',
@@ -75,6 +79,7 @@ export class EasebuzzService {
           message: 'Payment URL generated successfully'
         };
       } else {
+        await LoggerService.error('easebuzz', 'initiation_failed', { error: result.data }, data.txnid);
         // Error
         return {
           status: 'error',
@@ -83,6 +88,7 @@ export class EasebuzzService {
         };
       }
     } catch (error: any) {
+      await LoggerService.error('easebuzz', 'initiation_exception', { error: error.message }, data.txnid);
       console.error('[EASEBUZZ_INITIATE_ERROR]', error);
       return {
         status: 'error',
