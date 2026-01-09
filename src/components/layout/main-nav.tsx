@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
 import { NAV_LINKS } from "@/lib/constants"
+import { SearchBar } from "./search-bar"
 
 export function MainNav() {
   return (
@@ -44,7 +45,7 @@ export function MainNav() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex flex-1 justify-center">
+        <div className="hidden lg:flex flex-1 justify-center px-8">
           <NavigationMenu>
             <NavigationMenuList>
               {NAV_LINKS.map((link) => (
@@ -89,11 +90,9 @@ export function MainNav() {
           </NavigationMenu>
         </div>
 
-        {/* Search & Actions Placeholder */}
+        {/* Search & Actions */}
         <div className="flex items-center gap-4">
-           <Button variant="outline" size="sm" className="hidden xl:flex border-stone-200 text-stone-600 hover:bg-stone-50 rounded-full px-6">
-             Search products...
-           </Button>
+           <SearchBar className="hidden xl:flex" />
            
            {/* Mobile Menu */}
            <div className="lg:hidden">
