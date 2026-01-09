@@ -63,8 +63,8 @@ describe('End-to-End Checkout Flow Integration', () => {
       // 1. Initiation
       const checkoutReq = {
         json: () => Promise.resolve({
-          items: [{ price: 50, quantity: 2 }],
-          userId: 'user123',
+          items: [{ id: 'prod-1', price: 50, quantity: 2 }],
+          userId: '00000000-0000-0000-0000-000000000000',
           shippingAddress: { firstname: 'John', email: 'john@example.com', phone: '1234567890' },
           paymentMethod: 'easebuzz',
         }),
@@ -100,8 +100,8 @@ describe('End-to-End Checkout Flow Integration', () => {
       // 1. Initiation
       const checkoutReq = {
         json: () => Promise.resolve({
-          items: [{ price: 100, quantity: 1 }],
-          userId: 'user456',
+          items: [{ id: 'prod-2', price: 100, quantity: 1 }],
+          userId: '00000000-0000-0000-0000-000000000000',
           shippingAddress: { firstname: 'Jane', email: 'jane@example.com', phone: '0987654321' },
           paymentMethod: 'payu',
         }),

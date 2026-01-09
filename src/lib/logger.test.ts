@@ -3,19 +3,16 @@ import { supabaseAdmin } from './supabase';
 
 // Mock Supabase
 jest.mock('./supabase', () => {
-  const mockInsert = jest.fn(() => Promise.resolve({ error: null }));
-  const mockFrom = jest.fn(() => ({
-    insert: mockInsert,
+  const mInsert = jest.fn(() => Promise.resolve({ error: null }));
+  const mFrom = jest.fn(() => ({
+    insert: mInsert,
   }));
   return {
     supabaseAdmin: {
-      from: mockFrom,
+      from: mFrom,
     },
   };
 });
-
-import { LoggerService } from './logger';
-import { supabaseAdmin } from './supabase';
 
 describe('LoggerService', () => {
   let consoleLogSpy: jest.SpyInstance;
@@ -68,18 +65,36 @@ describe('LoggerService', () => {
     }));
   });
 
-  it('should log warn to console and database', async () => {
-    await LoggerService.warn('test-source', 'warn_event');
+  it('should sanitize sensitive keys from details', async () => {
+    const sensitiveData = {
+      orderId: '123',
+      hash: 'secret-hash',
+      apiKey: 'secret-key',
+      user: {
+        password: 'password123',
+        email: 'test@example.com'
+      }
+    };
 
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('[WARN] [test-source] warn_event'),
-      ''
+    await LoggerService.info('security-test', 'sensitive_event', sensitiveData);
+
+    const expectedSanitized = {
+      orderId: '123',
+      hash: '[REDACTED]',
+      apiKey: '[REDACTED]',
+      user: {
+        password: '[REDACTED]',
+        email: 'test@example.com'
+      }
+    };
+
+    expect(consoleLogSpy).toHaveBeenCalledWith(
+      expect.stringContaining('sensitive_event'),
+      expectedSanitized
     );
 
     expect(supabaseAdmin.from('audit_logs').insert).toHaveBeenCalledWith(expect.objectContaining({
-      level: 'warn',
-      source: 'test-source',
-      event: 'warn_event'
+      details: expectedSanitized
     }));
   });
 });

@@ -12,19 +12,35 @@ export interface LogEntry {
 }
 
 export class LoggerService {
+  private static sanitize(details: any): any {
+    if (!details) return details;
+    const sensitiveKeys = ['hash', 'key', 'salt', 'token', 'password', 'clientSecret', 'refreshToken'];
+    
+    const sanitized = { ...details };
+    for (const key of Object.keys(sanitized)) {
+      if (sensitiveKeys.some(s => key.toLowerCase().includes(s.toLowerCase()))) {
+        sanitized[key] = '[REDACTED]';
+      } else if (typeof sanitized[key] === 'object') {
+        sanitized[key] = this.sanitize(sanitized[key]);
+      }
+    }
+    return sanitized;
+  }
+
   static async log(entry: LogEntry) {
     const { level, source, event, details, order_id, user_id } = entry;
+    const sanitizedDetails = this.sanitize(details);
 
     // 1. Console Logging
     const timestamp = new Date().toISOString();
     const consoleMsg = `[${timestamp}] [${level.toUpperCase()}] [${source}] ${event}`;
     
     if (level === 'error') {
-      console.error(consoleMsg, details || '');
+      console.error(consoleMsg, sanitizedDetails || '');
     } else if (level === 'warn') {
-      console.warn(consoleMsg, details || '');
+      console.warn(consoleMsg, sanitizedDetails || '');
     } else {
-      console.log(consoleMsg, details || '');
+      console.log(consoleMsg, sanitizedDetails || '');
     }
 
     // 2. Database Logging (Persistent Audit Trail)
@@ -35,7 +51,7 @@ export class LoggerService {
           level,
           source,
           event,
-          details,
+          details: sanitizedDetails,
           order_id,
           user_id
         });

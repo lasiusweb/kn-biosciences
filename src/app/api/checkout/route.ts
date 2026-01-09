@@ -3,10 +3,20 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { EasebuzzService } from '@/lib/integrations/easebuzz';
 import { PayUService } from '@/lib/integrations/payu';
 import { LoggerService } from '@/lib/logger';
+import { CheckoutSchema } from '@/lib/schemas';
 
 export async function POST(req: Request) {
     try {
-        const { items, userId, shippingAddress, paymentMethod } = await req.json();
+        const body = await req.json();
+
+        // 0. Validation
+        const validation = CheckoutSchema.safeParse(body);
+        if (!validation.success) {
+            await LoggerService.warn('checkout', 'validation_failed', { errors: validation.error.format() });
+            return NextResponse.json({ success: false, error: 'Invalid request data', details: validation.error.format() }, { status: 400 });
+        }
+
+        const { items, userId, shippingAddress, paymentMethod } = validation.data;
 
         await LoggerService.info('checkout', 'order_initiation', { userId, paymentMethod, itemsCount: items.length });
 
