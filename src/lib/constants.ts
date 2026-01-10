@@ -101,6 +101,34 @@ export const SPECIALIZATIONS = [
   },
 ];
 
+export const TESTIMONIALS = [
+  {
+    quote: "KN Bio Sciences' probiotics transformed my shrimp pond. The survival rate increased by 30% in just one season.",
+    author: "Ramesh Kumar",
+    role: "Pond Champion, Andhra Pradesh",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
+  },
+  {
+    quote: "The soil health solutions provided by Sudha Reddy's team helped us transition to 100% organic farming smoothly.",
+    author: "Laxmi Devi",
+    role: "Organic Farmer, Karnataka",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100",
+  },
+  {
+    quote: "Reliable products and exceptional expert support. Their field visits are invaluable for large-scale operations.",
+    author: "Sanjay Singh",
+    role: "Commercial Poultry Farmer, Punjab",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100",
+  },
+];
+
+export const TRUST_INDICATORS = [
+  { label: "Founded In", value: "1997" },
+  { label: "Happy Farmers", value: "50,000+" },
+  { label: "Certifications", value: "ISO 9001:2015" },
+  { label: "Products", value: "100+ Solutions" },
+];
+
 export const FEATURED_PRODUCTS = [
   {
     id: "1",
