@@ -80,6 +80,27 @@ export const HERO_SLIDES = [
   },
 ];
 
+export const SPECIALIZATIONS = [
+  {
+    title: "Aquaculture",
+    description: "Advanced probiotics and water conditioners for high-yield shrimp and fish farming.",
+    image: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=800",
+    href: "/segments/pond-champions",
+  },
+  {
+    title: "Poultry",
+    description: "Bio-science based feed supplements and health solutions for thriving poultry farms.",
+    image: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?w=800",
+    href: "/segments/poultry-pro",
+  },
+  {
+    title: "STP Solutions",
+    description: "Eco-friendly bacterial cultures for efficient Sewage Treatment Plant management.",
+    image: "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=800",
+    href: "/shop/bio/stp",
+  },
+];
+
 export const FEATURED_PRODUCTS = [
   {
     id: "1",
