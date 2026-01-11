@@ -1,243 +1,171 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import Image from 'next/image';
-
-const MOCK_ITEMS = [
-    { id: '1', title: 'Bio-Fertilizer Pro', price: 1200, quantity: 2, image: 'https://images.unsplash.com/photo-1582560475093-ba66accbc424?w=400' },
-    { id: '2', title: 'Aquaculture Booster', price: 850, quantity: 1, image: 'https://images.unsplash.com/photo-1533038590840-1cde6e6e40df?w=400' },
-];
+import React, { useState } from 'react';
+import { useCart } from '@/lib/cart-context';
+import { CheckoutPaymentByExpress } from '@/components/checkout/checkout-payment-by-express';
+import { formatCurrency, formatName, formatPhoneNumber } from '@/lib/i18n-utils';
+import { ShieldCheck, Truck, CreditCard, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function CheckoutPage() {
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState('easebuzz'); // Default to Easebuzz
-    const [address, setAddress] = useState({
-        firstname: 'John',
-        lastname: 'Doe',
-        email: 'john@example.com',
-        phone: '9999999999',
-        street: '123 Agri Lane',
-        city: 'Bangalore',
-        state: 'Karnataka',
-        pincode: '560001'
+  const { totalPrice, items, clearCart } = useCart();
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    city: '',
+    zip: ''
+  });
+
+  const handlePayment = async () => {
+    // Basic validation
+    if (!formData.name || !formData.phone) {
+      toast({
+        title: "Validation Error",
+        description: "Please provide your name and phone number.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Logic for actual handoff would go here
+    console.log('Finalizing order for', formatName(formData.name), 'at', formatPhoneNumber(formData.phone));
+    
+    // Simulate processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    toast({
+      title: "Order Placed!",
+      description: "Redirecting to payment gateway...",
     });
+    
+    // clearCart(); // Typically after successful payment
+  };
 
-    const total = MOCK_ITEMS.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  return (
+    <div className="min-h-screen bg-stone-50 py-12 px-4 md:px-8">
+      <div className="max-w-5xl mx-auto">
+        <Link href="/cart" className="inline-flex items-center text-sm font-bold text-stone-400 hover:text-primary mb-8 group">
+          <ArrowLeft className="mr-2 w-4 h-4 transition-transform group-hover:-translate-x-1" />
+          Back to Cart
+        </Link>
 
-    const handleCheckout = async () => {
-        setIsProcessing(true);
-        try {
-            const response = await fetch('/api/checkout', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    items: MOCK_ITEMS,
-                    userId: '00000000-0000-0000-0000-000000000000', // Mock UUID
-                    shippingAddress: address,
-                    paymentMethod: paymentMethod, // Include selected payment method
-                }),
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                if (result.payment?.type === 'form_post') {
-                    // Handle PayU Form Post
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = result.payment.data.action;
-                    
-                    Object.keys(result.payment.data).forEach(key => {
-                        if (key !== 'action') {
-                            const input = document.createElement('input');
-                            input.type = 'hidden';
-                            input.name = key;
-                            input.value = result.payment.data[key];
-                            form.appendChild(input);
-                        }
-                    });
-                    
-                    document.body.appendChild(form);
-                    form.submit();
-                } else if (result.payment?.data && typeof result.payment.data === 'string' && result.payment.data.startsWith('http')) {
-                    // Handle Easebuzz Redirect
-                    alert(`Redirecting to Payment via ${paymentMethod}: ${result.payment.data}`);
-                    window.location.href = result.payment.data;
-                } else {
-                    alert('Invalid payment configuration received.');
-                }
-            } else {
-                alert('Checkout failed: ' + result.error);
-            }
-        } catch (error) {
-            console.error(error);
-            alert('An error occurred during checkout.');
-        } finally {
-            setIsProcessing(false);
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-neutral-50 px-4 py-12 md:px-8 lg:px-16">
-            <div className="mx-auto max-w-6xl">
-                <h1 className="mb-8 text-4xl font-bold tracking-tight text-neutral-900">Secure Checkout</h1>
-
-                <div className="grid gap-12 lg:grid-cols-12">
-                    {/* Left: Shipping Form */}
-                    <div className="lg:col-span-7">
-                        <div className="rounded-3xl bg-white p-8 shadow-sm border border-neutral-100">
-                            <h2 className="mb-6 text-xl font-semibold text-neutral-800">Shipping Information</h2>
-                            <div className="grid gap-6 sm:grid-cols-2">
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-600">First Name</label>
-                                    <input
-                                        type="text"
-                                        value={address.firstname}
-                                        onChange={e => setAddress({ ...address, firstname: e.target.value })}
-                                        className="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-neutral-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-600">Last Name</label>
-                                    <input type="text" className="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-neutral-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all" />
-                                </div>
-                                <div className="sm:col-span-2">
-                                    <label className="block text-sm font-medium text-neutral-600">Email Address</label>
-                                    <input type="email" className="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-neutral-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all" />
-                                </div>
-                                <div className="sm:col-span-2">
-                                    <label className="block text-sm font-medium text-neutral-600">Phone Number</label>
-                                    <input type="tel" className="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-neutral-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all" />
-                                </div>
-                                <div className="sm:col-span-2">
-                                    <label className="block text-sm font-medium text-neutral-600">Street Address</label>
-                                    <textarea className="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-neutral-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all" rows={2}></textarea>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-600">City</label>
-                                    <input type="text" className="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-neutral-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-neutral-600">Pincode</label>
-                                    <input type="text" className="mt-1 block w-full rounded-xl border border-neutral-200 bg-white px-4 py-2.5 text-neutral-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition-all" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="mt-8 rounded-3xl bg-white p-8 shadow-sm border border-neutral-100">
-                            <h2 className="mb-6 text-xl font-semibold text-neutral-800">Payment Method</h2>
-                            <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <input
-                                        id="easebuzz"
-                                        name="paymentMethod"
-                                        type="radio"
-                                        value="easebuzz"
-                                        checked={paymentMethod === 'easebuzz'}
-                                        onChange={() => setPaymentMethod('easebuzz')}
-                                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-neutral-300"
-                                    />
-                                    <label htmlFor="easebuzz" className="ml-3 block text-base font-medium text-neutral-700">
-                                        Easebuzz
-                                    </label>
-                                </div>
-                                <div className="flex items-center">
-                                    <input
-                                        id="payu"
-                                        name="paymentMethod"
-                                        type="radio"
-                                        value="payu"
-                                        checked={paymentMethod === 'payu'}
-                                        onChange={() => setPaymentMethod('payu')}
-                                        className="h-4 w-4 text-green-600 focus:ring-green-500 border-neutral-300"
-                                    />
-                                    <label htmlFor="payu" className="ml-3 block text-base font-medium text-neutral-700">
-                                        PayU
-                                    </label>
-                                </div>
-                            </div>
-
-                            {paymentMethod === 'easebuzz' && (
-                                <div className="mt-6 rounded-3xl bg-green-50 p-6 border border-green-100 flex items-center gap-4">
-                                    <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-green-600 shadow-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2" /><line x1="2" x2="22" y1="10" y2="10" /></svg>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-green-900">Easebuzz Secure Payment</p>
-                                        <p className="text-sm text-green-700">Encrypted and secure transactions. Supports Cards, UPI, Netbanking.</p>
-                                    </div>
-                                </div>
-                            )}
-
-                            {paymentMethod === 'payu' && (
-                                <div className="mt-6 rounded-3xl bg-blue-50 p-6 border border-blue-100 flex items-center gap-4">
-                                    <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-blue-600 shadow-sm">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v18Z"/><path d="M14 2v6h6"/><path d="M10 13h4"/><path d="M10 17h4"/></svg>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-blue-900">PayU Secure Payment</p>
-                                        <p className="text-sm text-blue-700">Fast and reliable payments. Supports Cards, UPI, Netbanking, Wallets.</p>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Right: Order Summary */}
-                    <div className="lg:col-span-5">
-                        <div className="sticky top-8 rounded-3xl bg-neutral-900 p-8 text-white shadow-xl shadow-neutral-200">
-                            <h2 className="mb-8 text-xl font-semibold">Order Summary</h2>
-
-                            <div className="space-y-6">
-                                {MOCK_ITEMS.map(item => (
-                                    <div key={item.id} className="flex gap-4">
-                                        <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl bg-neutral-800">
-                                            <img src={item.image} alt={item.title} className="h-full w-full object-cover opacity-80" />
-                                        </div>
-                                        <div className="flex flex-1 flex-col justify-between py-1">
-                                            <div>
-                                                <p className="font-medium text-neutral-200">{item.title}</p>
-                                                <p className="text-sm text-neutral-500">Qty: {item.quantity}</p>
-                                            </div>
-                                            <p className="font-semibold">₹{(item.price * item.quantity).toLocaleString()}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="mt-8 space-y-3 border-t border-neutral-800 pt-8">
-                                <div className="flex justify-between text-sm text-neutral-400">
-                                    <span>Subtotal</span>
-                                    <span className="text-neutral-200">₹{total.toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between text-sm text-neutral-400">
-                                    <span>Shipping</span>
-                                    <span className="text-green-400">FREE</span>
-                                </div>
-                                <div className="flex justify-between text-lg font-bold text-white pt-2">
-                                    <span>Total</span>
-                                    <span>₹{total.toLocaleString()}</span>
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={handleCheckout}
-                                disabled={isProcessing}
-                                className={`mt-10 w-full rounded-2xl py-4 text-center text-lg font-bold transition-all shadow-lg ${isProcessing
-                                        ? 'bg-neutral-700 text-neutral-400 cursor-not-allowed'
-                                        : 'bg-green-500 text-neutral-950 hover:bg-green-400 active:scale-95 shadow-green-500/20'
-                                    }`}
-                            >
-                                {isProcessing ? 'Processing...' : 'Proceed to Payment'}
-                            </button>
-
-                            <p className="mt-6 text-center text-xs text-neutral-500">
-                                By completing your purchase, you agree to our Terms of Service.
-                            </p>
-                        </div>
-                    </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Left: Shipping Form */}
+          <div className="space-y-8">
+            <section className="bg-white rounded-[2rem] p-8 border border-stone-100 shadow-sm">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <Truck className="w-5 h-5 text-primary" />
                 </div>
+                <h2 className="text-xl font-bold text-stone-900">Shipping Details</h2>
+              </div>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase font-bold text-stone-400 tracking-widest ml-1">Full Name</label>
+                    <Input 
+                      placeholder="e.g. Sudha Reddy" 
+                      className="rounded-xl h-12 border-stone-100"
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase font-bold text-stone-400 tracking-widest ml-1">Phone Number</label>
+                    <Input 
+                      placeholder="e.g. 9999999999" 
+                      className="rounded-xl h-12 border-stone-100"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase font-bold text-stone-400 tracking-widest ml-1">Complete Address</label>
+                  <Input 
+                    placeholder="House No, Street, Landmark" 
+                    className="rounded-xl h-12 border-stone-100"
+                    value={formData.address}
+                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Input 
+                    placeholder="City" 
+                    className="rounded-xl h-12 border-stone-100"
+                    value={formData.city}
+                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                  />
+                  <Input 
+                    placeholder="ZIP Code" 
+                    className="rounded-xl h-12 border-stone-100"
+                    value={formData.zip}
+                    onChange={(e) => setFormData({...formData, zip: e.target.value})}
+                  />
+                </div>
+              </div>
+            </section>
+
+            <div className="flex items-center gap-2 text-stone-400 justify-center">
+              <ShieldCheck className="w-4 h-4" />
+              <span className="text-[10px] uppercase font-bold tracking-widest">Encrypted Checkout</span>
             </div>
+          </div>
+
+          {/* Right: Payment */}
+          <aside className="space-y-6">
+            <div className="bg-stone-900 rounded-[2rem] p-8 text-white shadow-xl shadow-stone-200">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
+                  <CreditCard className="w-5 h-5 text-amber-400" />
+                </div>
+                <h2 className="text-xl font-bold">Payment Summary</h2>
+              </div>
+
+              <div className="space-y-4 mb-10">
+                <div className="flex justify-between text-sm">
+                  <span className="text-stone-400">Total Items ({items.length})</span>
+                  <span className="font-bold">{formatCurrency(totalPrice)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-stone-400">
+                  <span>Standard Shipping</span>
+                  <span className="text-green-400 font-bold uppercase text-[10px] tracking-widest pt-1">Free</span>
+                </div>
+                <div className="pt-6 border-t border-white/10 flex justify-between items-end">
+                  <span className="text-stone-400 font-medium">Grand Total</span>
+                  <span className="text-3xl font-bold text-amber-400">{formatCurrency(totalPrice)}</span>
+                </div>
+              </div>
+
+              <CheckoutPaymentByExpress 
+                total={totalPrice} 
+                onInitiate={handlePayment}
+              />
+            </div>
+
+            <div className="bg-white rounded-3xl p-6 border border-stone-100 space-y-4">
+               <p className="text-xs font-bold text-stone-900 uppercase tracking-tight">Order Review</p>
+               <div className="space-y-3">
+                 {items.slice(0, 3).map(item => (
+                   <div key={item.id} className="flex justify-between text-xs">
+                     <span className="text-stone-500">{item.quantity}x {item.name}</span>
+                     <span className="font-bold text-stone-900">{formatCurrency(item.price * item.quantity)}</span>
+                   </div>
+                 ))}
+                 {items.length > 3 && (
+                   <p className="text-[10px] text-stone-400 text-center">+ {items.length - 3} more items</p>
+                 )}
+               </div>
+            </div>
+          </aside>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
