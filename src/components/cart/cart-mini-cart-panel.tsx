@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart-context";
 import { ShoppingCart, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { CartItemsUi } from "./cart-items-ui";
 
 interface CartMiniCartPanelProps {
   children: React.ReactNode;
@@ -59,32 +60,7 @@ export function CartMiniCartPanel({ children }: CartMiniCartPanelProps) {
               </SheetTrigger>
             </div>
           ) : (
-            <div className="space-y-6">
-              {items.map((item) => (
-                <div key={`${item.id}-${item.variantId}`} className="flex gap-4">
-                  <div className="w-20 h-20 bg-stone-100 rounded-xl overflow-hidden shrink-0">
-                    {/* Placeholder for image */}
-                    {item.image ? (
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-stone-300">
-                        <ShoppingCart className="w-8 h-8" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 flex flex-col justify-center">
-                    <h4 className="text-sm font-bold text-stone-900 line-clamp-1">{item.name}</h4>
-                    {item.variantName && (
-                      <p className="text-[10px] text-stone-500 uppercase font-bold tracking-wider">{item.variantName}</p>
-                    )}
-                    <div className="mt-1 flex items-center justify-between">
-                      <p className="text-xs text-stone-500">{item.quantity} x {formatCurrency(item.price)}</p>
-                      <p className="text-sm font-bold text-primary">{formatCurrency(item.price * item.quantity)}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <CartItemsUi isMini={true} />
           )}
         </div>
 
